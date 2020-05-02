@@ -1,0 +1,46 @@
+import discord
+import asyncio
+import requests
+from json import loads
+client = discord.Client()
+
+token = "봇 토큰"
+
+@client.event
+async def on_ready(): #방송알림
+    print('Logged in as')
+    print(client.user.name)
+    print(client.user.id)
+    print('------')
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('정상 작동'))
+    twitch = "트위치 id"
+    name = "이름"
+    channel = client.get_channel(703569369502056469)
+    a = 0
+    while True:
+        headers = {'Client-ID': 'j6l5l7ebqob3d6rjoziafz4go38fjs'}
+        response = requests.get("https://api.twitch.tv/helix/streams?user_login=" + twitch, headers=headers)
+        try:
+            if loads(response.text)['data'][0]['type'] == 'live' and a == 0:
+                await channel.send("@everyone" + name + "님이 방송을 시작하였습니다. url")
+                a = 1
+        except:
+            a = 0
+        await asyncio.sleep(3)
+
+@client.event
+async def on_message(message):
+
+    if message.content.startswith('!test'):
+        await message.channel.send('test')
+
+    if message.content.startswith("!1"):
+        embed = discord.Embed(title="안녕하세요!", description="저는 테스트중인 봇입니다.", color=0x00ff00)
+        embed.set_thumbnail(url=message.author.avatar_url)
+        embed.add_field(name="미완성", value="현제 제작중", inline=True)
+        embed.add_field(name="미완성", value="현제 제작중", inline=True)
+        await message.channel.send(embed=embed)
+
+# -------관리자--------
+
+client.run(token)
